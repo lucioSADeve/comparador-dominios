@@ -61,16 +61,37 @@
     <div id="resultado"></div>
 
     <script>
+        function normalizarDominio(dominio) {
+            // Remove espaços em branco
+            dominio = dominio.trim();
+            
+            // Remove protocolo (http:// ou https://)
+            dominio = dominio.replace(/^https?:\/\//i, '');
+            
+            // Remove www.
+            dominio = dominio.replace(/^www\./i, '');
+            
+            // Completa extensões parciais comuns
+            dominio = dominio.replace(/\.co\.\.$/, '.com');
+            dominio = dominio.replace(/\.ne\.\.$/, '.net');
+            dominio = dominio.replace(/\.or\.\.$/, '.org');
+            
+            // Remove qualquer "/" no final
+            dominio = dominio.replace(/\/$/, '');
+            
+            return dominio;
+        }
+
         function compararDominios() {
             // Obtém os valores dos textareas e converte em arrays
             const dominiosA = document.getElementById('listaA').value
                 .split('\n')
-                .map(d => d.trim())
+                .map(d => normalizarDominio(d))
                 .filter(d => d.length > 0);
             
             const dominiosB = document.getElementById('listaB').value
                 .split('\n')
-                .map(d => d.trim())
+                .map(d => normalizarDominio(d))
                 .filter(d => d.length > 0);
 
             // Encontra domínios que estão em B mas não em A
