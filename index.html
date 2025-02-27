@@ -70,30 +70,34 @@
 
         function normalizarDominio(dominio) {
             // Extrai apenas o domínio da string (remove DA/DR e outros dados)
-            dominio = dominio.split('|')[0];  // Pega apenas a parte antes do |
+            dominio = dominio.split('|')[0].trim();
             
-            // Remove espaços em branco
-            dominio = dominio.trim();
-            
-            // Remove protocolo (http:// ou https://)
+            // Remove protocolo e www
             dominio = dominio.replace(/^https?:\/\//i, '');
-            
-            // Remove www.
             dominio = dominio.replace(/^www\./i, '');
             
-            // Completa extensões parciais comuns
-            dominio = dominio.replace(/\.co\.\.$/, '.com');
-            dominio = dominio.replace(/\.ne\.\.$/, '.net');
-            dominio = dominio.replace(/\.or\.\.$/, '.org');
+            // Extrai o padrão base para blogs
+            const blogPattern = dominio.match(/^([a-zA-Z0-9-]+)\.(blogosfera|blogfolha|blog)/i);
+            if (blogPattern) {
+                // Retorna apenas o nome do blog + plataforma (ex: "danielcara.blogosfera")
+                return blogPattern[1] + '.' + blogPattern[2];
+            }
             
-            // Remove qualquer "/" no final
+            // Processamento normal para outros domínios
+            dominio = dominio.replace(/\.co\.\.$/i, '.com');
+            dominio = dominio.replace(/\.ne\.\.$/i, '.net');
+            dominio = dominio.replace(/\.or\.\.$/i, '.org');
+            dominio = dominio.replace(/\.com\.\.$/i, '.com.br');
+            dominio = dominio.replace(/\.\.+$/g, '');
             dominio = dominio.replace(/\/$/, '');
-            
-            // Remove caracteres especiais (como ⁠)
             dominio = dominio.replace(/[^\w\.-]/g, '');
+            dominio = dominio.replace(/\.$/, '');
 
-            // Retorna o domínio apenas se for válido, caso contrário retorna string vazia
-            return isDominio(dominio) ? dominio : '';
+            if (/gazetadopovo\.com$/.test(dominio)) {
+                dominio = dominio + '.br';
+            }
+
+            return isDominio(dominio) ? dominio : dominio.split('.').slice(0, 2).join('.');
         }
 
         function copiarResultados() {
@@ -125,8 +129,13 @@
                 .map(d => normalizarDominio(d))
                 .filter(d => d.length > 0);
 
-            // Encontra domínios que estão em B mas não em A
-            const dominiosFaltantes = dominiosB.filter(dominio => !dominiosA.includes(dominio));
+            // Encontra domínios que estão em B mas não em A usando comparação flexível
+            const dominiosFaltantes = dominiosB.filter(dominioB => {
+                return !dominiosA.some(dominioA => 
+                    dominioA.toLowerCase().includes(dominioB.toLowerCase()) || 
+                    dominioB.toLowerCase().includes(dominioA.toLowerCase())
+                );
+            });
 
             // Exibe o resultado
             const resultadoDiv = document.getElementById('resultado');
