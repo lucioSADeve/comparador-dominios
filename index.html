@@ -62,7 +62,16 @@
     <div id="resultado"></div>
 
     <script>
+        function isDominio(str) {
+            // Verifica se a string tem formato de domínio (algo.extensao)
+            // Aceita subdomínios e extensões compostas (.com.br, .net.br, etc)
+            return /^[a-zA-Z0-9][a-zA-Z0-9-]*\.[a-zA-Z.]+[a-zA-Z]$/.test(str);
+        }
+
         function normalizarDominio(dominio) {
+            // Extrai apenas o domínio da string (remove DA/DR e outros dados)
+            dominio = dominio.split('|')[0];  // Pega apenas a parte antes do |
+            
             // Remove espaços em branco
             dominio = dominio.trim();
             
@@ -80,7 +89,11 @@
             // Remove qualquer "/" no final
             dominio = dominio.replace(/\/$/, '');
             
-            return dominio;
+            // Remove caracteres especiais (como ⁠)
+            dominio = dominio.replace(/[^\w\.-]/g, '');
+
+            // Retorna o domínio apenas se for válido, caso contrário retorna string vazia
+            return isDominio(dominio) ? dominio : '';
         }
 
         function copiarResultados() {
