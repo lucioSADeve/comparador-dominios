@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparador de Domínios</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        .column {
+            flex: 1;
+        }
+        textarea {
+            width: 100%;
+            height: 300px;
+            margin-bottom: 10px;
+        }
+        #resultado {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Comparador de Domínios</h1>
+    
+    <div class="container">
+        <div class="column">
+            <h3>Lista A (Seus domínios)</h3>
+            <textarea id="listaA" placeholder="Digite um domínio por linha&#10;Exemplo:&#10;google.com&#10;facebook.com"></textarea>
+        </div>
+        <div class="column">
+            <h3>Lista B (Domínios para comparar)</h3>
+            <textarea id="listaB" placeholder="Digite um domínio por linha&#10;Exemplo:&#10;google.com&#10;twitter.com"></textarea>
+        </div>
+    </div>
+
+    <button onclick="compararDominios()" class="btn">Comparar Domínios</button>
+
+    <div id="resultado"></div>
+
+    <script>
+        function compararDominios() {
+            // Obtém os valores dos textareas e converte em arrays
+            const dominiosA = document.getElementById('listaA').value
+                .split('\n')
+                .map(d => d.trim())
+                .filter(d => d.length > 0);
+            
+            const dominiosB = document.getElementById('listaB').value
+                .split('\n')
+                .map(d => d.trim())
+                .filter(d => d.length > 0);
+
+            // Encontra domínios que estão em B mas não em A
+            const dominiosFaltantes = dominiosB.filter(dominio => !dominiosA.includes(dominio));
+
+            // Exibe o resultado
+            const resultadoDiv = document.getElementById('resultado');
+            
+            if (dominiosFaltantes.length === 0) {
+                resultadoDiv.innerHTML = '<p>Todos os domínios da Lista B já estão presentes na Lista A!</p>';
+            } else {
+                resultadoDiv.innerHTML = `
+                    <h3>Domínios que faltam na Lista A (${dominiosFaltantes.length}):</h3>
+                    <pre>${dominiosFaltantes.join('\n')}</pre>
+                `;
+            }
+        }
+    </script>
+</body>
+</html> 
